@@ -1,0 +1,42 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main'
+        }
+    }
+}
+jar {
+    baseName = 'spring-authorisation-framework'
+    version =  '0.0.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId 'com.github.gauravchauhan89'
+        }
+        maven {
+            url "https://svn.apache.org/viewvc/maven"
+        }
+    }
+}
+
+dependencies {
+    compile("org.springframework:spring-core:4.3.6.RELEASE") {
+        exclude module: "commons-logging"
+    }
+    compile("org.springframework.security:spring-security-web:4.2.1.RELEASE")
+    compile("org.aspectj:aspectjweaver:1.8.8")
+    compile('org.slf4j:slf4j-api:1.7.24')
+}
