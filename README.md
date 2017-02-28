@@ -15,7 +15,7 @@ Use appropriate spring annotations ([RequestParam][1], [PathVariable][2] and [Re
 3. `Business Object` : This is basically the resource url is pointing to (think like REST resource).
 It is the responsibility of permission class to fetch this resource. So, all permission classes should
 implement `BasePermission.getBusinessObject()`. Instead, `BasePermission.useReturnValueAsBusinessObject()` can
-used if Http Method is [safe][4] `GET` or `HEAD` .
+used if Http Method is [safe][4] i.e `GET` or `HEAD` .
 
 
 Permission contains validation rules for all these objects.
@@ -108,7 +108,7 @@ to proceed. It is like ORing the permissions. Support for ANDing is not there (c
 ####Multiple Roles:
 User can have multiple roles.
 
-###BusinessObjectRule
+####BusinessObjectRule
 Role can contain additional business object rules, which basically are constraints on business object
 in addition to permission. If parent role has some BusinessObjectRule rules, those will be replaced
 by child's rules. Example configuration :
