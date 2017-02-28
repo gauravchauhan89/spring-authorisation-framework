@@ -1,4 +1,4 @@
-Spring Authorisation framework based on http://www9.org/w9-papers/EC-Security/153.pdf.
+Spring Web Authorisation framework based on http://www9.org/w9-papers/EC-Security/153.pdf.
 
 Example RestController :
 
