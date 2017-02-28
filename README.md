@@ -122,7 +122,7 @@ by child's rules. Example configuration :
 	"businessObjectRules" : [
 		{
 			"ruleName" : "OrganisationConstraintRule",
-			"arguments" : "google"
+			"arguments" : ["google"]
 		}
 	]
 }
