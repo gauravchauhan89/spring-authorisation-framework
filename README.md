@@ -7,12 +7,12 @@ Permission is the authority needed to perform an action. It translates to sub-cl
 
 Permission is provided with 3 objects:
 
-1. `Authenticated User` : User that has been authenticated by spring-security authentication.
+1. <b>Authenticated User<\b> : User that has been authenticated by spring-security authentication.
 
-2. `Transactional Object` : All query parameters, path parameters and request body of http request.
+2. <b>Transactional Object<\b> : All query parameters, path parameters and request body of http request.
 Use appropriate spring annotations ([RequestParam][1], [PathVariable][2] and [RequestBody][3]) for this to work.
 
-3. `Business Object` : This is basically the resource url is pointing to (think like REST resource).
+3. <b>Business Object<\b> : This is basically the resource url is pointing to (think like REST resource).
 It is the responsibility of permission class to fetch this resource. So, all permission classes should
 implement `BasePermission.getBusinessObject()`. Instead, `BasePermission.useReturnValueAsBusinessObject()` can
 used if Http Method is [safe][4] i.e `GET` or `HEAD` .
@@ -99,6 +99,8 @@ This should be it.
 
 Now, when a authenticated user logs in, she/he will only be able to access this method if it has required
 permission and permission evaluates to true.
+
+---
 
 ####Multiple permissions on Method:
 As, you may have noticed, `permission` in `@Permission(permission = {ViewAllUsersPermission.class})`
