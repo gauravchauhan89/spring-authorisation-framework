@@ -1,7 +1,28 @@
-Spring Web Authorisation framework based on http://www9.org/w9-papers/EC-Security/153.pdf.
+Spring Authorisation framework based on http://www9.org/w9-papers/EC-Security/153.pdf.
 
+Concepts
+======
+###Permission
+Permission is the authority needed to perform an action. It translates to sub-class of `BasePermission`.
+Permission is provided with 3 objects:
+1. `Authenticated User` : User that has been authenticated by spring-security authentication.
+2. `Transactional Object` : All query parameters, path parameters and request body of http request.
+Use appropriate spring annotations ([RequestParam][1], [PathVariable][2] and [RequestBody][3]) for this to work.
+3. `Business Object` : This is basically the resource url is pointing to (think like REST resource).
+It is the responsibility of permission class to fetch this resource. So, all permission classes should
+implement `BasePermission.getBusinessObject()`. Instead, `BasePermission.useReturnValueAsBusinessObject()` can
+used if Http Method is [safe][4] `GET` or `HEAD` .
+
+
+Permission contains validation rules for all these objects.
+
+###Role
+Role is collection of permissions with some additional `BusinessObjectRule` (explained later)
+###Group
+Group is collection of roles. Groups are not yet supported.
 
 How to use?
+======
 
 This framework works in conjunction with spring-security.
 `SecurityContextHolder.getContext().getAuthentication().getPrincipal()` should return authenticated user
@@ -26,6 +47,7 @@ in `src/main/impl/ConcreteRoleService` which fetches roles from mongodb.
 }
 ```
 
+
 Next, create a permission class like below :
 ```
 @Component("ViewAllUsersPermission")
@@ -49,8 +71,8 @@ public class ViewAllUsersPermission extends BasePermission {
 }
 ```
 
-Next annotate `RestController` method, which requires this permission, like below:
 
+Next annotate `RestController` method, which requires this permission, like below:
 ```
 @RestController
 public class UsersController {
@@ -66,10 +88,58 @@ This should be it.
 Now, when a authenticated user logs in, she/he will only be able to access this method if it has required
 permission and permission evaluates to true.
 
-Multiple permissions on Method:
+####Multiple permissions on Method:
 As, you may have noticed, `permission` in `@Permission(permission = {ViewAllUsersPermission.class})`
 is an array. So, multiple permissions can be entered. User having either one of them will be allowed
 to proceed. It is like ORing the permissions. Support for ANDing is not there (can be added later).
 
-Multiple Roles:
+####Multiple Roles:
 User can have multiple roles.
+
+###BusinessObjectRule
+Role can contain additional business object rules, which basically are constraints on business object
+in addition to permission. If parent role has some BusinessObjectRule rules, those will be replaced
+by child's rules. Example
+```
+{
+	"_id" : ObjectId("58ac19c0e8fe35e7961a735f"),
+	"name" : "Google User",
+	"parent" : "User",
+	"businessObjectRules" : [
+		{
+			"ruleName" : "OrganisationConstraintRule",
+			"arguments" : "google"
+		}
+	]
+}
+```
+
+`Google User` will have all the permissions from `User` role with additional business object rule named
+`OrganisationConstraintRule`, which will restricts that `Google User` should be able to access business objects
+of `google` only. If it tries to access business object of any other organisation, it will not be allowed.
+
+```
+@Component("OrganisationConstraintRule")
+public class OrganisationConstraintRule implements BusinessObjectRule {
+
+  @Override
+  public boolean validate(Object authenticatedUser, Object businessObject, List<String> args) throws Exception {
+    AuthenticatedUser authenticatedUser1 = (AuthenticatedUser) authenticatedUser;
+    if(businessObject instanceof User) {
+      User user = (User) businessObject;
+      if(args.contains(user.getCompany())) {
+        return true;
+      }
+    } else {
+      throw new ServerErrorException("OrganisationConstraintRule: Unknown business object type");
+    }
+
+    return false;
+  }
+}
+```
+
+[1]: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestParam.html
+[2]: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/PathVariable.html
+[3]: http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestBody.html
+[4]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
