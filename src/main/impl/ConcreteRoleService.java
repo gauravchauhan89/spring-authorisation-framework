@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 /**
- * Fetch all the roles from Database
+ * This is a sample implementation of RoleService, which fetched roles from Mongodb.
  *
  * Created by gaurav on 15/02/17.
  */
