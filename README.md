@@ -2,6 +2,7 @@ Spring Authorisation framework based on http://www9.org/w9-papers/EC-Security/15
 
 Example RestController :
 
+```
 @RestController
 public class UsersController {
     @Permission(permission = {ViewAllUsersPermission.class})
@@ -32,9 +33,9 @@ public class UsersController {
         return user;
     }
 }
-
+```
 Example permission class:
-
+```
 @Component("ViewAllUsersPermission")
 public class ViewAllUsersPermission extends BasePermission {
 
@@ -54,10 +55,11 @@ public class ViewAllUsersPermission extends BasePermission {
     return true;
   }
 }
-
+```
 
 Authenticated users can have multiple roles and roles can be fetched via concrete implementation of RoleService.
 For example, RoleService can fetch roles from Mongo :
+```
 {
 	"_id" : ObjectId("58a435cbc5e5637d317d2d81"),
 	"name" : "User",
@@ -72,3 +74,4 @@ For example, RoleService can fetch roles from Mongo :
 		"CreateUserPermission"
 	]
 }
+```
