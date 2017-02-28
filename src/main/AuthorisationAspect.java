@@ -156,6 +156,7 @@ public class AuthorisationAspect {
     }
 
     /**
+     * User might contain multiple roles. Only all additional rules from one role should pass.
      *
      * @param user
      * @param businessObject
@@ -170,7 +171,7 @@ public class AuthorisationAspect {
             // no rule to check
             return true;
         }
-        for (int i = 0; i < rules.size(); i++) {
+        for (int i = 0; i < rules.size(); i++) { // check for all roles
             List<BusinessObjectRule> businessRules = rules.get(i);
             if (businessRules != null && businessRules.size() > 0) {
                 boolean success = true;
@@ -182,12 +183,12 @@ public class AuthorisationAspect {
                     }
                 }
                 if(success) {
-                    // successfully validated all the rules in set
+                    // successfully validated all the rules in this role
                     return true;
                 }
             }
         }
-        // if none of the rules set return true, return false
+        // if none of the rules validation for any roles return true, return false
         return false;
     }
 
