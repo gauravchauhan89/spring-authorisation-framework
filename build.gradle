@@ -20,17 +20,17 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            groupId 'com.github.gauravchauhan89'
-        }
-        maven {
-            url "https://svn.apache.org/viewvc/maven"
-        }
-    }
-}
+//publishing {
+//    publications {
+//        mavenJava(MavenPublication) {
+//            from components.java
+//            groupId 'com.github.gauravchauhan89'
+//        }
+//        maven {
+//            url "https://svn.apache.org/viewvc/maven"
+//        }
+//    }
+//}
 
 dependencies {
     compile("org.springframework:spring-core:4.3.6.RELEASE") {
@@ -39,4 +39,7 @@ dependencies {
     compile("org.springframework.security:spring-security-web:4.2.1.RELEASE")
     compile("org.aspectj:aspectjweaver:1.8.8")
     compile('org.slf4j:slf4j-api:1.7.24')
+    // for impl
+    compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
+    compile 'org.eclipse.jetty:jetty-util:9.3.11.v20160721'
 }
