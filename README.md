@@ -4,10 +4,14 @@ Concepts
 ======
 ###Permission
 Permission is the authority needed to perform an action. It translates to sub-class of `BasePermission`.
+
 Permission is provided with 3 objects:
+
 1. `Authenticated User` : User that has been authenticated by spring-security authentication.
+
 2. `Transactional Object` : All query parameters, path parameters and request body of http request.
 Use appropriate spring annotations ([RequestParam][1], [PathVariable][2] and [RequestBody][3]) for this to work.
+
 3. `Business Object` : This is basically the resource url is pointing to (think like REST resource).
 It is the responsibility of permission class to fetch this resource. So, all permission classes should
 implement `BasePermission.getBusinessObject()`. Instead, `BasePermission.useReturnValueAsBusinessObject()` can
@@ -25,11 +29,18 @@ How to use?
 ======
 
 This framework works in conjunction with spring-security.
+
 `SecurityContextHolder.getContext().getAuthentication().getPrincipal()` should return authenticated user
-class object (this can depend on your project) and `SecurityContextHolder.getContext().getAuthentication().getAuthorities()`
-should return `List<? extends GrantedAuthority>` of authenticated user. `RoleService.getRoles().get(GrantedAuthority.getAuthority())` will be used to
-get actual `Role` object. How you set these values, is up to you. A sample implementation of RoleService is provided
+class object and `SecurityContextHolder.getContext().getAuthentication().getAuthorities()`
+should return `List<? extends GrantedAuthority>` of authenticated user.
+
+`RoleService.getRoles().get(GrantedAuthority.getAuthority())` will be used to
+get actual `Role` object. How you set these values, is up to you.
+
+A sample implementation of RoleService is provided
 in `src/main/impl/ConcreteRoleService` which fetches roles from mongodb.
+
+Sample configuration from database :
 ```
 {
 	"_id" : ObjectId("58a435cbc5e5637d317d2d81"),
@@ -48,7 +59,7 @@ in `src/main/impl/ConcreteRoleService` which fetches roles from mongodb.
 ```
 
 
-Next, create a permission class like below :
+Next, create a permission class, like below :
 ```
 @Component("ViewAllUsersPermission")
 public class ViewAllUsersPermission extends BasePermission {
@@ -72,7 +83,7 @@ public class ViewAllUsersPermission extends BasePermission {
 ```
 
 
-Next annotate `RestController` method, which requires this permission, like below:
+Next annotate `RestController`'s `RequestMapping` method, which requires this permission with `@Permission`, like below:
 ```
 @RestController
 public class UsersController {
@@ -85,6 +96,7 @@ public class UsersController {
 }
 ```
 This should be it.
+
 Now, when a authenticated user logs in, she/he will only be able to access this method if it has required
 permission and permission evaluates to true.
 
@@ -99,7 +111,7 @@ User can have multiple roles.
 ###BusinessObjectRule
 Role can contain additional business object rules, which basically are constraints on business object
 in addition to permission. If parent role has some BusinessObjectRule rules, those will be replaced
-by child's rules. Example
+by child's rules. Example configuration :
 ```
 {
 	"_id" : ObjectId("58ac19c0e8fe35e7961a735f"),
@@ -114,9 +126,9 @@ by child's rules. Example
 }
 ```
 
-`Google User` will have all the permissions from `User` role with additional business object rule named
-`OrganisationConstraintRule`, which will restricts that `Google User` should be able to access business objects
-of `google` only. If it tries to access business object of any other organisation, it will not be allowed.
+In this example, User having `Google User` role, will have all the permissions from `User` role. Additionally, business object rule named
+`OrganisationConstraintRule` will impose restriction that user can access business objects
+of `google` only. If it tries to access business object of any other organisation, it will not be authorised.
 
 ```
 @Component("OrganisationConstraintRule")
