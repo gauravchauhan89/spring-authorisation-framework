@@ -1,8 +1,21 @@
-Spring Authorisation framework based on http://www9.org/w9-papers/EC-Security/153.pdf.
+# Spring Web Authorisation Framework
+This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
 
-Concepts
-======
-###Permission
+### Table of Contents
+1. [Getting started](#getting-started)
+2. [Concepts](#concepts)
+3. [How to use?](#how-to-use?)
+
+## Getting started
+1. Download `build/lib/spring-authorisation-framework-0.0.1.jar` and all dependency from `build.gradle`.
+2. [Setup spring-security authentication.](#setting-up-spring-security-authentication)
+3. Implement `RoleService` or use `src/main/impl/ConcreteRoleService.java` with mongodb.
+4. Create child classes of `BasePermission`.
+5. Annotate controller's method with `@Permission`.
+
+## Concepts
+
+####Permission
 Permission is the authority needed to perform an action. It translates to sub-class of `BasePermission`.
 
 Permission is provided with 3 objects:
@@ -20,16 +33,16 @@ used if Http Method is [safe][4] i.e `GET` or `HEAD` .
 
 Permission contains validation rules for all these objects.
 
-###Role
+####Role
 Role is collection of permissions with some additional `BusinessObjectRule` (explained later)
-###Group
+####Group
 Group is collection of roles. Groups are not yet supported.
 
-How to use?
-======
+## How to use?
 
 This framework works in conjunction with spring-security.
 
+#### Setting up spring security authentication
 `SecurityContextHolder.getContext().getAuthentication().getPrincipal()` should return authenticated user
 class object and `SecurityContextHolder.getContext().getAuthentication().getAuthorities()`
 should return `List<? extends GrantedAuthority>` of authenticated user.
