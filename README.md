@@ -153,6 +153,8 @@ public class OrganisationConstraintRule implements BusinessObjectRule {
 }
 ```
 
+There is scope of a lot of improvements, specially for handling of `BusinessObjectRule`. If you have any idea/suggestion or want to contribute, please shoot a mail at gaurav.the.iiitian@gmail.com.
+
 [1]: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestParam.html
 [2]: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/PathVariable.html
 [3]: http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestBody.html
