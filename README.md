@@ -4,7 +4,7 @@ This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
 ### Table of Contents
 1. [Getting started](#getting-started)
 2. [Concepts](#concepts)
-3. [How to use?](#how-to-use?)
+3. [How to use?](#how-to-use)
 
 ## Getting started
 1. Download `build/lib/spring-authorisation-framework-0.0.1.jar` and all dependency from `build.gradle`.
@@ -50,6 +50,7 @@ should return `List<? extends GrantedAuthority>` of authenticated user.
 `RoleService.getRoles().get(GrantedAuthority.getAuthority())` will be used to
 get actual `Role` object. How you set these values, is up to you.
 
+#### Implementing RoleService
 A sample implementation of RoleService is provided
 in `src/main/impl/ConcreteRoleService` which fetches roles from mongodb.
 
@@ -71,7 +72,7 @@ Sample configuration from database :
 }
 ```
 
-
+#### Creating permission class
 Next, create a permission class, like below :
 ```
 @Component("ViewAllUsersPermission")
