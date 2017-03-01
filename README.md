@@ -17,19 +17,14 @@ This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
 
 ### Permission
 Permission is the authority needed to perform an action. It translates to sub-class of `BasePermission`.
-
 Permission is provided with 3 objects:
-
 1. `Authenticated User` : User that has been authenticated by spring-security authentication.
-
 2. `Transactional Object` : All query parameters, path parameters and request body of http request.
 Use appropriate spring annotations ([RequestParam][1], [PathVariable][2] and [RequestBody][3]) for this to work.
-
 3. `Business Object` : This is basically the resource url is pointing to (think like REST resource).
 It is the responsibility of permission class to fetch this resource. So, all permission classes should
 implement `BasePermission.getBusinessObject()`. Instead, `BasePermission.useReturnValueAsBusinessObject()` can
 used if Http Method is [safe][4] i.e `GET` or `HEAD` .
-
 Permission contains validation rules for all these objects.
 
 
