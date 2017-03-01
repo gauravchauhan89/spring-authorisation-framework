@@ -15,7 +15,7 @@ This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
 
 ## Concepts
 
-#### Permission
+### Permission
 Permission is the authority needed to perform an action. It translates to sub-class of `BasePermission`.
 
 Permission is provided with 3 objects:
@@ -33,11 +33,11 @@ used if Http Method is [safe][4] i.e `GET` or `HEAD` .
 Permission contains validation rules for all these objects.
 
 
-#### Role
+### Role
 Role is collection of permissions with some additional [`BusinessObjectRule`](#businessobjectrule)
 
 
-#### Group
+### Group
 Group is collection of roles. Groups are not yet supported.
 
 ## How to use?
