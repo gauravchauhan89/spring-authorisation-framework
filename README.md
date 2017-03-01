@@ -1,6 +1,6 @@
 # Spring Web Authorisation Framework
 This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
-It breaks the problem of Authorisation into 3 constructs: __permissions__, __roles__ and __users__ (4th one is __groups__, which is not yet supported).
+It tries to solve the problem of Authorisation using [__permissions__](#permission), [__roles__](#role) and [__users__](#user).
 
 ### Table of Contents
 1. [Getting started](#getting-started)
@@ -33,6 +33,9 @@ Role is collection of permissions with some additional [`BusinessObjectRule`](#b
 
 ### Group
 Group is collection of roles. Groups are not yet supported.
+
+### User
+User can contains a list of roles.
 
 ## How to use?
 
