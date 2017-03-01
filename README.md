@@ -96,7 +96,7 @@ public class ViewAllUsersPermission extends BasePermission {
 }
 ```
 
-
+#### Annotate controller's methods
 Next annotate `RestController`'s `RequestMapping` method, which requires this permission with `@Permission`, like below:
 ```
 @RestController
