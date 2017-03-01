@@ -1,6 +1,6 @@
 # Spring Web Authorisation Framework
 This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
-It breaks the problem of Authorisation into 3 constructs: __permissions__, __roles__ and __users___ (4th one is __groups__, which is not yet supported).
+It breaks the problem of Authorisation into 3 constructs: __permissions__, __roles__ and __users__ (4th one is __groups__, which is not yet supported).
 
 ### Table of Contents
 1. [Getting started](#getting-started)
