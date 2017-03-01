@@ -4,7 +4,7 @@ This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
 ### Table of Contents
 1. [Getting started](#getting-started)
 2. [Concepts](#concepts)
-3. [How to use?](#how-to-use?)
+3. [How to use?](#how-to-use)
 
 ## Getting started
 1. Download `build/lib/spring-authorisation-framework-0.0.1.jar` and all dependency from `build.gradle`.
@@ -15,7 +15,7 @@ This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
 
 ## Concepts
 
-####Permission
+* ####Permission
 Permission is the authority needed to perform an action. It translates to sub-class of `BasePermission`.
 
 Permission is provided with 3 objects:
@@ -33,9 +33,9 @@ used if Http Method is [safe][4] i.e `GET` or `HEAD` .
 
 Permission contains validation rules for all these objects.
 
-####Role
+* ####Role
 Role is collection of permissions with some additional `BusinessObjectRule` (explained later)
-####Group
+* ####Group
 Group is collection of roles. Groups are not yet supported.
 
 ## How to use?
