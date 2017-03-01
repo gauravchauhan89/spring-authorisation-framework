@@ -50,6 +50,7 @@ should return `List<? extends GrantedAuthority>` of authenticated user.
 `RoleService.getRoles().get(GrantedAuthority.getAuthority())` will be used to
 get actual `Role` object. How you set these values, is up to you.
 
+#### Implementing RoleService
 A sample implementation of RoleService is provided
 in `src/main/impl/ConcreteRoleService` which fetches roles from mongodb.
 
@@ -71,7 +72,7 @@ Sample configuration from database :
 }
 ```
 
-
+#### Creating permission class
 Next, create a permission class, like below :
 ```
 @Component("ViewAllUsersPermission")
