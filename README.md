@@ -15,7 +15,7 @@ This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
 
 ## Concepts
 
-1. __Permission__
+#### Permission
 Permission is the authority needed to perform an action. It translates to sub-class of `BasePermission`.
 
 Permission is provided with 3 objects:
@@ -30,12 +30,14 @@ It is the responsibility of permission class to fetch this resource. So, all per
 implement `BasePermission.getBusinessObject()`. Instead, `BasePermission.useReturnValueAsBusinessObject()` can
 used if Http Method is [safe][4] i.e `GET` or `HEAD` .
 
-
 Permission contains validation rules for all these objects.
 
-2. __Role__
+
+#### Role
 Role is collection of permissions with some additional [`BusinessObjectRule`](#businessobjectrule)
-3. __Group__
+
+
+#### Group
 Group is collection of roles. Groups are not yet supported.
 
 ## How to use?
