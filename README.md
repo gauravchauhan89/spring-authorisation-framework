@@ -116,15 +116,15 @@ permission and permission evaluates to true.
 
 ---
 
-####Multiple permissions on Method:
+#### Multiple permissions on Method:
 As, you may have noticed, `permission` in `@Permission(permission = {ViewAllUsersPermission.class})`
 is an array. So, multiple permissions can be entered. User having either one of them will be allowed
 to proceed. It is like ORing the permissions. Support for ANDing is not there (can be added later).
 
-####Multiple Roles:
+#### Multiple Roles:
 User can have multiple roles.
 
-####BusinessObjectRule
+#### BusinessObjectRule
 Role can contain additional business object rules, which basically are constraints on business object
 in addition to permission. If parent role has some BusinessObjectRule rules, those will be replaced
 by child's rules. Example configuration :
