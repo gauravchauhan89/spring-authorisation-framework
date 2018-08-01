@@ -11,7 +11,7 @@ This framework can be used to solve your complex authorisation needs. It tries t
 ## Getting started
 1. Download `build/lib/spring-authorisation-framework-0.0.1.jar` and all dependency from `build.gradle`.
 2. [Setup spring-security authentication.](#setting-up-spring-security-authentication)
-3. Implement `RoleService` or use `src/main/impl/ConcreteRoleService.java` with mongodb.
+3. Implement `RoleService` or use `src/main/com/github/gauravchauhan89/framework/authorisation/impl/ConcreteRoleService.java` with mongodb.
 4. Create child classes of `BasePermission`.
 5. Annotate controller's method with `@Permission`.
 
@@ -52,7 +52,7 @@ get actual `Role` object. How you set these values, is up to you.
 
 #### Implementing RoleService
 A sample implementation of RoleService is provided
-in `src/main/impl/ConcreteRoleService` which fetches roles from mongodb.
+in `src/main/com/github/gauravchauhan89/framework/authorisation/impl/ConcreteRoleService` which fetches roles from mongodb.
 
 Sample configuration from database :
 ```

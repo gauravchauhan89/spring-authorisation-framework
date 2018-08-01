@@ -20,7 +20,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -73,86 +72,120 @@ public class AuthorisationAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Class<? extends BasePermission>[] permissionClasses = signature.getMethod().getAnnotation(Permission.class).permission();
 
-        for(Class<? extends BasePermission> permissionClass : permissionClasses) {
-            boolean permissionFound = false;
-            List<List<BusinessObjectRule>> rules = new ArrayList<List<BusinessObjectRule>>();
-            List<List<List<String>>> args = new ArrayList<List<List<String>>>();
-            BasePermission permission = context.getBean(permissionClass);
-            for (Role role : roles) {
+        AuthorisationException authorisationException = null;
+        boolean returnValueAvailable = false;
+        Object businessObject = null;
+        List<List<BusinessObjectRule>> rulesToBeEvaluate = new ArrayList<>();
+        List<List<List<String>>> rulesArguments = new ArrayList<>();
+        for (Role role : roles) {
+            for (Class<? extends BasePermission> permissionClass : permissionClasses) {
+                BasePermission permission = context.getBean(permissionClass);
                 if (role.getUserPermissions().contains(permission)) {
-                    permissionFound = true;
-                    if(role.getRules() != null && role.getRules().size()>0) {
-                        // collect all the additional rules
-                        rules.add(role.getRules());
-                        args.add(role.getArguments());
-                    }
-                }
-            }
-            if(permissionFound) {
-                LOGGER.info("Required Permission: {}", permissionClass);
-                RequestObject requestObject = getRequestObject(joinPoint);
-                LOGGER.info("RequestObject: {}", requestObject.toString());
-                try {
-                    // validate permission
-                    if (permission.isAuthorised(user, requestObject)) {
-                        LOGGER.info("Permission Valid. Now checking {} additional rules.", rules.size());
-                        if (rules.size() > 0) {
-                            boolean returnValueAvailable = false;
-                            Object businessObject = null;
-                            if (permission.useReturnValueAsBusinessObject()) {
-                                if (!isMethodSafe(joinPoint)) {
-                                    throw new UnSafeMethodException(
-                                        "Method whose return value you are trying to use "
-                                            + "as business object, is not safe. Please modify "
-                                            + permission.getClass().getName()
-                                            + " to return business object.");
+                    LOGGER.info("Required Permission: {}", permissionClass);
+                    RequestObject requestObject = getRequestObject(joinPoint);
+                    LOGGER.info("RequestObject: {}", requestObject.toString());
+                    try {
+                        // validate permission
+                        if (permission.isAuthorised(user, requestObject)) {
+                            LOGGER.info("Permission Valid. Now checking {} additional rules.",
+                                role.getRules().size());
+                            if (role.getRules().size() > 0) {
+                                if(businessObject == null) {
+                                    if (permission.useReturnValueAsBusinessObject()) {
+                                        if (!isMethodSafe(joinPoint)) {
+                                            throw new UnSafeMethodException(
+                                                "Method whose return value you are trying to use "
+                                                    + "as business object, is not safe. Please modify "
+                                                    + permission.getClass().getName()
+                                                    + " to return business object.");
+                                        }
+                                        businessObject = joinPoint.proceed();
+                                        returnValueAvailable = true;
+                                    } else {
+                                        businessObject = permission
+                                            .getBusinessObject(requestObject);
+                                    }
+                                    if (businessObject == null) {
+                                        throw new NullPointerException(
+                                            "Business object cannot be null. Please modify "
+                                                + permission.getClass().getName()
+                                                + " to return business object.");
+                                    }
+                                } else {
+                                    if(!permission.useReturnValueAsBusinessObject()) {
+                                        Object ruleBusinessObject = permission.getBusinessObject(requestObject);
+                                        if(!ruleBusinessObject.getClass().equals(businessObject.getClass())) {
+                                            throw new AuthorisationException(
+                                                "Permissions on same method should return same business object");
+                                        }
+                                    }
                                 }
-                                businessObject = joinPoint.proceed();
-                                returnValueAvailable = true;
-                            } else {
-                                businessObject = permission.getBusinessObject(requestObject);
-                            }
-                            if (businessObject == null) {
-                                throw new NullPointerException(
-                                    "Business object cannot be null. Please modify "
-                                        + permission.getClass().getName()
-                                        + " to return business object.");
-                            }
-                            // check for additional business object rules
-                            if(!validateRules(user, businessObject, rules, args, permission)) {
-                                throw new AuthorisationException(authorizationFailureMessage);
-                            }
-                            if (returnValueAvailable) {
-                                return businessObject;
+                                rulesToBeEvaluate.add(role.getRules());
+                                rulesArguments.add(role.getArguments());
                             }
                         }
-                        return joinPoint.proceed();
+                    } catch (BeansException ex) {
+                        LOGGER.error("Exception in getting permission/rule class bean", ex);
+                        throw new AuthorisationException("Cannot get permission/rule class bean");
+                    } catch (AuthorisationException ex) {
+                        LOGGER.info("authorisation failure: {}", ex.getMessage());
+                        authorisationException = ex;
                     }
-                } catch (BeansException ex) {
-                    LOGGER.error("Exception in getting permission/rule class bean", ex);
-                    throw ex;
-                } catch (AuthorisationException ex) {
-                    LOGGER.info("authorisation failure: {}", ex.getMessage());
-                    throw ex;
                 }
             }
+        }
+        if (roles.size() > 0 && validateRules(user, businessObject, rulesToBeEvaluate, rulesArguments)) {
+            if (returnValueAvailable) {
+                return businessObject;
+            } else {
+                return joinPoint.proceed();
+            }
+        }
+        if(authorisationException != null) {
+            throw new AuthorisationException(authorisationException.getMessage());
         }
         throw new AuthorisationException(authorizationFailureMessage);
     }
 
-    private boolean validateRules(Object user, Object businessObjects, List<List<BusinessObjectRule>> rules, List<List<List<String>>> args,  BasePermission permission) throws Exception {
+    private boolean validateRules(Object user, Object businessObjects, List<List<BusinessObjectRule>> rules, List<List<List<String>>> args) throws Exception {
+        if(rules.size() == 0) {
+            return true;
+        }
         // Collection check
         if(businessObjects instanceof Collection) {
-            for (Object businessObject : (Collection) businessObjects) {
-                // if for any object in the collection rules fail, return false
-                if (!checkRules(user, businessObject, rules, args, permission)) {
-                    return false;
-                }
-            }
-            return true;
+            return validateCollectionBusinessObject(user, businessObjects, rules, args);
         } else {
-            return checkRules(user, businessObjects, rules, args, permission);
+            int i=0;
+            for(List<BusinessObjectRule> ruleList : rules) {
+                if (checkRules(user, businessObjects, ruleList, args.get(i))) {
+                    return true;
+                }
+                i++;
+            }
+            return false;
         }
+    }
+
+    private boolean validateCollectionBusinessObject(Object user, Object businessObjects, List<List<BusinessObjectRule>> rules, List<List<List<String>>> args) throws Exception {
+        Collection collection = (Collection) businessObjects;
+        if(collection.size() == 0) {
+            return true;
+        }
+        int validObjects = 0;
+        for (Object businessObject : collection) {
+            int i=0;
+            for(List<BusinessObjectRule> ruleList : rules) {
+                if (checkRules(user, businessObject, ruleList, args.get(i))) {
+                    validObjects++;
+                    break;
+                }
+                i++;
+            }
+        }
+        if(validObjects == collection.size()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -160,36 +193,21 @@ public class AuthorisationAspect {
      *
      * @param user
      * @param businessObject
-     * @param rules
      * @param args
-     * @param permission
      * @return boolean
      * @throws Throwable
      */
-    private boolean checkRules(Object user, Object businessObject, List<List<BusinessObjectRule>> rules, List<List<List<String>>> args,  BasePermission permission) throws Exception {
-        if(rules.size() == 0) {
-            // no rule to check
-            return true;
-        }
-        for (int i = 0; i < rules.size(); i++) { // check for all roles
-            List<BusinessObjectRule> businessRules = rules.get(i);
-            if (businessRules != null && businessRules.size() > 0) {
-                boolean success = true;
-                for (int j = 0; j < businessRules.size(); j++) {
-                    BusinessObjectRule rule = businessRules.get(j);
-                    if (!rule.validate(user, businessObject, args.get(i).get(j))) {
-                        LOGGER.info("Rule failed: {}", rule.getClass().getSimpleName());
-                        success = false;
-                    }
-                }
-                if(success) {
-                    // successfully validated all the rules in this role
-                    return true;
+    private boolean checkRules(Object user, Object businessObject, List<BusinessObjectRule> businessRules, List<List<String>> args) throws Exception {
+        if (businessRules != null && businessRules.size() > 0) {
+            for (int j = 0; j < businessRules.size(); j++) {
+                BusinessObjectRule rule = businessRules.get(j);
+                if (!rule.validate(user, businessObject, args.get(j))) {
+                    LOGGER.info("Rule failed: {}", rule.getClass().getSimpleName());
+                    return false;
                 }
             }
         }
-        // if none of the rules validation for any roles return true, return false
-        return false;
+        return true;
     }
 
     /**
