@@ -77,6 +77,7 @@ public class AuthorisationAspect {
         Object businessObject = null;
         List<List<BusinessObjectRule>> rulesToBeEvaluate = new ArrayList<>();
         List<List<List<String>>> rulesArguments = new ArrayList<>();
+        boolean permissionMatched = false;
         for (Role role : roles) {
             for (Class<? extends BasePermission> permissionClass : permissionClasses) {
                 BasePermission permission = context.getBean(permissionClass);
@@ -87,6 +88,7 @@ public class AuthorisationAspect {
                     try {
                         // validate permission
                         if (permission.isAuthorised(user, requestObject)) {
+                            permissionMatched = true;
                             LOGGER.info("Permission Valid. Now checking {} additional rules.",
                                 role.getRules().size());
                             if (role.getRules().size() > 0) {
@@ -134,7 +136,7 @@ public class AuthorisationAspect {
                 }
             }
         }
-        if (roles.size() > 0 && validateRules(user, businessObject, rulesToBeEvaluate, rulesArguments)) {
+        if (permissionMatched && roles.size() > 0 && validateRules(user, businessObject, rulesToBeEvaluate, rulesArguments)) {
             if (returnValueAvailable) {
                 return businessObject;
             } else {
