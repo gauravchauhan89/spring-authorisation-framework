@@ -1,7 +1,7 @@
 # Spring Web Authorisation Framework
 This framework is based on http://www9.org/w9-papers/EC-Security/153.pdf.
 
-This framework can be used to solve your complex authorisation needs. It tries to solve the problem using [__permissions__](#permission), [__roles__](#role) and [__users__](#user). Management of roles and permission is kept flexible and independent of framework. You can create multiple permissions in code and manage then later in runtime using any configuration machanism of your choice (database, config file or etc.)
+This framework can be used to solve your complex authorisation needs in web domain. It tries to solve the problem using [__permissions__](#permission), [__roles__](#role) and [__users__](#user). Management of roles and permission is kept flexible and independent of framework. You can create multiple permissions in code and manage then later in runtime using any configuration machanism of your choice (database, config file or etc.)
 
 ### Table of Contents
 1. [Getting started](#getting-started)
